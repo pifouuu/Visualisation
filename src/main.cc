@@ -93,7 +93,7 @@ int main() {
 	// and won't be deleted (this is useful when creating a script).
 	gp << "plot";
 	for (int i=0;i<NUMACTIONS;i++){
-		gp << gp.file1d(act_suc[i]) << "with impulses title 'act_succes_" << actions[i]<<"',";
+		gp << gp.file1d(act_suc[i]) << "with lines title 'act_succes_" << actions[i]<<"',";
 	}
 	gp << std::endl;
 
