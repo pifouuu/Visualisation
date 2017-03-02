@@ -16,11 +16,10 @@
 #include <boost/serialization/utility.hpp>
 #include "../include/gnuplot-iostream.h"
 
-#define NUMACTIONS 11
+#define NUMACTIONS 8
 
 int main() {
 	Gnuplot gp;
-	int cnt_actions = 0;
 	std::vector<std::string> actions;
 	actions.push_back(std::string("GO_TO_EYE"));
 	actions.push_back(std::string("LOOK_RED_BOX"));
@@ -29,21 +28,21 @@ int main() {
 	actions.push_back(std::string("PUT_DOWN"));
 	actions.push_back(std::string("PUT_IN"));
 	actions.push_back(std::string("LOOK_RED_BLOCK_0"));
-	actions.push_back(std::string("LOOK_RED_BLOCK_1"));
+	//actions.push_back(std::string("LOOK_RED_BLOCK_1"));
 	actions.push_back(std::string("LOOK_BLUE_BLOCK_0"));
-	actions.push_back(std::string("LOOK_BLUE_BLOCK_1"));
-	actions.push_back(std::string("LOOK_BLUE_BLOCK_2"));
+	//actions.push_back(std::string("LOOK_BLUE_BLOCK_1"));
+	//actions.push_back(std::string("LOOK_BLUE_BLOCK_2"));
 
 	std::vector<std::vector<std::pair<float,float>>> act_try(NUMACTIONS);
 	std::string dirname = "../myTexplore/";
-	std::string name = dirname+"no_tutor_v_3.000000_n_3.000000_act_try_";
+	std::string name = dirname+"no_tutor_v_0.000000_n_0.000000_act_try_";
 	for (int i=0; i<NUMACTIONS; i++){
 		std::ifstream ifs(name+actions[i]+".ser");
 		boost::archive::text_iarchive ia(ifs);
 		ia & act_try[i];
 	}
 
-	gp << "set xrange [0:5000]\nset yrange [0:40]\n";
+	gp << "set xrange [0:100]\nset yrange [0:30]\n";
 	// Data will be sent via a temporary file.  These are erased when you call
 	// gp.clearTmpfiles() or when gp goes out of scope.  If you pass a filename
 	// (e.g. "gp.file1d(pts, 'mydata.dat')"), then the named file will be created
@@ -54,16 +53,16 @@ int main() {
 	}
 	gp << std::endl;
 
-	/*
+
 	std::vector<std::vector<std::pair<float,float>>> act_acc(NUMACTIONS);
-	name = dirname+"no_tutor_v_3.000000_n_3.000000_act_acc_";
+	name = dirname+"no_tutor_v_0.000000_n_0.000000_act_acc_";
 	for (int i=0; i<NUMACTIONS; i++){
 		std::ifstream ifs(name+actions[i]+".ser");
 		boost::archive::text_iarchive ia(ifs);
 		ia & act_acc[i];
 	}
 
-	gp << "set xrange [0:5000]\nset yrange [0:1]\n";
+	gp << "set xrange [0:3000]\nset yrange [0:1.5]\n";
 	gp << "set terminal x11 1\n";
 	// Data will be sent via a temporary file.  These are erased when you call
 	// gp.clearTmpfiles() or when gp goes out of scope.  If you pass a filename
@@ -74,10 +73,10 @@ int main() {
 		gp << gp.file1d(act_acc[i]) << "with lines title 'act_acc_" << actions[i]<<"',";
 	}
 	gp << std::endl;
-	*/
+
 
 	std::vector<std::vector<std::pair<float,float>>> act_suc(NUMACTIONS);
-	name = dirname+"no_tutor_v_3.000000_n_3.000000_act_succes_";
+	name = dirname+"no_tutor_v_0.000000_n_0.000000_act_succes_";
 	for (int i=0; i<NUMACTIONS; i++){
 		std::ifstream ifs(name+actions[i]+".ser");
 		boost::archive::text_iarchive ia(ifs);
@@ -99,32 +98,32 @@ int main() {
 
 
 	std::vector<std::pair<float,float>> blocks_in;
-	std::ifstream ifs(dirname+"no_tutor_v_3.000000_n_3.000000_blocks_in.ser");
+	std::ifstream ifs(dirname+"no_tutor_v_0.000000_n_0.000000_blocks_in.ser");
 	boost::archive::text_iarchive ia_in(ifs);
 	ia_in & blocks_in;
-	gp << "set xrange [0:5000]\nset yrange [0:5]\n";
+	gp << "set xrange [0:5000]\nset yrange [0:1]\n";
 	gp << "set terminal x11 3\n";
-	gp << "plot" << gp.file1d(blocks_in) << "with impulses title 'blocks_in'"<<std::endl;
+	gp << "plot" << gp.file1d(blocks_in) << "with lines title 'blocks_in'"<<std::endl;
 	ifs.close();
 	ifs.clear();
 
 	std::vector<std::pair<float,float>> blocks_right;
-	ifs.open(dirname+"no_tutor_v_3.000000_n_3.000000_blocks_right.ser");
+	ifs.open(dirname+"no_tutor_v_0.000000_n_0.000000_blocks_right.ser");
 	boost::archive::text_iarchive ia_right(ifs);
 	ia_right & blocks_right;
 	gp << "set xrange [0:5000]\nset yrange [0:5]\n";
 	gp << "set terminal x11 4\n";
-	gp << "plot" << gp.file1d(blocks_right) << "with impulses title 'blocks_right'"<<std::endl;
+	gp << "plot" << gp.file1d(blocks_right) << "with lines title 'blocks_right'"<<std::endl;
 	ifs.close();
 	ifs.clear();
 
 	std::vector<std::pair<float,float>> model_acc;
-	ifs.open(dirname+"no_tutor_v_3.000000_n_3.000000_model_acc.ser");
+	ifs.open(dirname+"no_tutor_v_0.000000_n_0.000000_model_acc.ser");
 	boost::archive::text_iarchive ia_model(ifs);
 	ia_model & model_acc;
-	gp << "set xrange [0:5000]\nset yrange [0:5]\n";
+	gp << "set xrange [0:5000]\nset yrange [0:7]\n";
 	gp << "set terminal x11 5\n";
-	gp << "plot" << gp.file1d(model_acc) << "with impulses title 'model_acc'"<<std::endl;
+	gp << "plot" << gp.file1d(model_acc) << "with lines title 'model_error'"<<std::endl;
 	ifs.close();
 	ifs.clear();
 
