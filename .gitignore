@@ -69,6 +69,7 @@ resultats/
 
 # debug files 
 Debug/
+*.mk
 
 # CDT-specific (C/C++ Development Tooling)
 .cproject
