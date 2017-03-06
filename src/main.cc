@@ -40,6 +40,7 @@ int main() {
 	bool BLOCKS_RIGHT = false;
 	bool MODEL_ACC = false;
 
+
 	std::string dirname = "../myTexplore/";
 	std::string name;
 	std::ifstream ifs;
@@ -47,7 +48,7 @@ int main() {
 	if (ACT_TRY){
 		std::vector<std::vector<std::pair<float,float>>> act_try(NUMACTIONS);
 
-		std::string name = dirname+"no_tutor_v_0.000000_n_0.000000_act_try_";
+		std::string name = dirname+"modelbased_";
 		for (int i=0; i<NUMACTIONS; i++){
 			ifs.open(name+actions[i]+".ser");
 			boost::archive::text_iarchive ia(ifs);
