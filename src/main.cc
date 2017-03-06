@@ -34,17 +34,17 @@ int main() {
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_1"));
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_2"));
 
-	bool ACT_ACC = true;
-	bool ACT_TRY = true;
+	bool ACT_ACC = false;
+	bool ACT_TRY = false;
 	bool ACT_SUC = false;
 	bool BLOCKS_IN = true;
 	bool BLOCKS_RIGHT = true;
-	bool MODEL_ACC = true;
+	bool MODEL_ACC = false;
 	bool ACCU_R = true;
 	bool ACCU_TUTOR_R = true;
 
 
-	std::string dirname = "../myTexplore/modelbased_no_tutor_14_8_2_";
+	std::string dirname = "../myTexplore/texplore_no_tutor_14_19_2_v_3.000000_n_3.000000_";
 	std::string name;
 	std::ifstream ifs;
 
@@ -170,7 +170,7 @@ int main() {
 		ifs.clear();
 	}
 
-	if (ACCU_R) {
+	if (ACCU_TUTOR_R) {
 		std::list<std::pair<float,float>> accu_tutor_r;
 		ifs.open(dirname+"accu_tutor_rewards.ser");
 		boost::archive::text_iarchive ia_r(ifs);
