@@ -41,9 +41,10 @@ int main() {
 	bool BLOCKS_RIGHT = true;
 	bool MODEL_ACC = true;
 	bool ACCU_R = true;
+	bool ACCU_TUTOR_R = true;
 
 
-	std::string dirname = "../myTexplore/texplore_s_dep_tutor_14_19_2_";
+	std::string dirname = "../myTexplore/modelbased_no_tutor_14_8_2_";
 	std::string name;
 	std::ifstream ifs;
 
@@ -60,7 +61,7 @@ int main() {
 			ifs.clear();
 		}
 
-		gp << "set xrange [0:50000]\nset yrange [0:10000]\n";
+		gp << "set xrange [0:4000]\nset yrange [0:2500]\n";
 		// Data will be sent via a temporary file.  These are erased when you call
 		// gp.clearTmpfiles() or when gp goes out of scope.  If you pass a filename
 		// (e.g. "gp.file1d(pts, 'mydata.dat')"), then the named file will be created
@@ -83,7 +84,7 @@ int main() {
 			ifs.clear();
 		}
 
-		gp << "set xrange [0:50000]\nset yrange [0:1.5]\n";
+		gp << "set xrange [0:4000]\nset yrange [0:1.5]\n";
 		gp << "set terminal x11 1\n";
 		// Data will be sent via a temporary file.  These are erased when you call
 		// gp.clearTmpfiles() or when gp goes out of scope.  If you pass a filename
@@ -126,7 +127,7 @@ int main() {
 		ifs.open(dirname+"blocks_in.ser");
 		boost::archive::text_iarchive ia_in(ifs);
 		ia_in & blocks_in;
-		gp << "set xrange [0:50000]\nset yrange [0:3]\n";
+		gp << "set xrange [0:4000]\nset yrange [0:6]\n";
 		gp << "set terminal x11 3\n";
 		gp << "plot" << gp.file1d(blocks_in) << "with lines title 'blocks_in'"<<std::endl;
 		ifs.close();
@@ -138,7 +139,7 @@ int main() {
 		ifs.open(dirname+"blocks_right.ser");
 		boost::archive::text_iarchive ia_right(ifs);
 		ia_right & blocks_right;
-		gp << "set xrange [0:20000]\nset yrange [0:2]\n";
+		gp << "set xrange [0:4000]\nset yrange [0:5]\n";
 		gp << "set terminal x11 4\n";
 		gp << "plot" << gp.file1d(blocks_right) << "with lines title 'blocks_right'"<<std::endl;
 		ifs.close();
@@ -150,7 +151,7 @@ int main() {
 		ifs.open(dirname+"model_acc.ser");
 		boost::archive::text_iarchive ia_model(ifs);
 		ia_model & model_acc;
-		gp << "set xrange [0:50000]\nset yrange [0:30]\n";
+		gp << "set xrange [0:4000]\nset yrange [0:30]\n";
 		gp << "set terminal x11 5\n";
 		gp << "plot" << gp.file1d(model_acc) << "with lines title 'model_error'"<<std::endl;
 		ifs.close();
@@ -162,9 +163,21 @@ int main() {
 		ifs.open(dirname+"accumulated_rewards.ser");
 		boost::archive::text_iarchive ia_r(ifs);
 		ia_r & accu_r;
-		gp << "set xrange [0:50000]\nset yrange [0:5000]\n";
+		gp << "set xrange [0:4000]\nset yrange [0:5000]\n";
 		gp << "set terminal x11 6\n";
 		gp << "plot" << gp.file1d(accu_r) << "with lines title 'accumultaed reward'"<<std::endl;
+		ifs.close();
+		ifs.clear();
+	}
+
+	if (ACCU_R) {
+		std::list<std::pair<float,float>> accu_tutor_r;
+		ifs.open(dirname+"accu_tutor_rewards.ser");
+		boost::archive::text_iarchive ia_r(ifs);
+		ia_r & accu_tutor_r;
+		gp << "set xrange [0:4000]\nset yrange [0:5000]\n";
+		gp << "set terminal x11 7\n";
+		gp << "plot" << gp.file1d(accu_tutor_r) << "with lines title 'accumultaed reward'"<<std::endl;
 		ifs.close();
 		ifs.clear();
 	}
