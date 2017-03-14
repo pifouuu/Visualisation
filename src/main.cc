@@ -17,7 +17,7 @@
 #include <boost/serialization/utility.hpp>
 #include "../include/gnuplot-iostream.h"
 
-#define NUMACTIONS 8
+#define NUMACTIONS 6
 
 int main() {
 	Gnuplot gp;
@@ -28,26 +28,24 @@ int main() {
 	actions.push_back(std::string("PICK"));
 	//actions.push_back(std::string("PUT_DOWN"));
 	actions.push_back(std::string("PUT_IN"));
-	actions.push_back(std::string("LOOK_RED_BLOCK_0"));
-	actions.push_back(std::string("LOOK_RED_BLOCK_1"));
+	//actions.push_back(std::string("LOOK_RED_BLOCK_0"));
+	//actions.push_back(std::string("LOOK_RED_BLOCK_1"));
 	actions.push_back(std::string("LOOK_BLUE_BLOCK_0"));
-	actions.push_back(std::string("LOOK_BLUE_BLOCK_1"));
+	//actions.push_back(std::string("LOOK_BLUE_BLOCK_1"));
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_2"));
 
-	bool ACT_ACC = false;
+	bool ACT_ACC = true;
 	bool ACT_TRY = false;
 	bool ACT_SUC = false;
 	bool BLOCKS_IN = false;
 	bool BLOCKS_RIGHT = false;
-	bool MODEL_ACC = true;
-	bool ACCU_R = false;
+	bool MODEL_ACC = false;
+	bool MODEL_ACC_R = true;
+	bool ACCU_R = true;
 	bool ACCU_TUTOR_R = false;
 
 
-	std::string dirname;
-	std::string dirname1 = "../myTexplore/modelbased_no_tutor_14_7_2_abstrans_splitmargin_0.05_mingainratio_0.0004_";
-	std::string dirname2 = "../myTexplore/modelbased_no_tutor_14_7_2_abstrans__";
-	std::string dirname3 = "../myTexplore/modelbased_no_tutor_14_7_2_";
+	std::string dirname = "../myTexplore/texplore_no_tutor_14_19_2_n_10.000000_lambda_0.100000_alpha_0.500000_df_0.990000_";
 	std::string name;
 	std::ifstream ifs;
 
@@ -64,7 +62,7 @@ int main() {
 			ifs.clear();
 		}
 
-		gp << "set xrange [0:60000]\nset yrange [0:6000]\n";
+		gp << "set xrange [0:1000]\nset yrange [0:6000]\n";
 		// Data will be sent via a temporary file.  These are erased when you call
 		// gp.clearTmpfiles() or when gp goes out of scope.  If you pass a filename
 		// (e.g. "gp.file1d(pts, 'mydata.dat')"), then the named file will be created
@@ -78,7 +76,7 @@ int main() {
 
 	if (ACT_ACC){
 		std::vector<std::vector<std::pair<float,float>>> act_acc(NUMACTIONS);
-		name = dirname+"act_acc_";
+		name = dirname+"model_acc_";
 		for (int i=0; i<NUMACTIONS; i++){
 			ifs.open(name+actions[i]+".ser");
 			boost::archive::text_iarchive ia(ifs);
@@ -87,7 +85,7 @@ int main() {
 			ifs.clear();
 		}
 
-		gp << "set xrange [0:40000]\nset yrange [0:1.5]\n";
+		gp << "set xrange [0:30000]\nset yrange [0:0.5]\n";
 		gp << "set terminal x11 1\n";
 		// Data will be sent via a temporary file.  These are erased when you call
 		// gp.clearTmpfiles() or when gp goes out of scope.  If you pass a filename
@@ -153,24 +151,42 @@ int main() {
 		std::vector<std::pair<int,float>> model_acc_1;
 		std::vector<std::pair<int,float>> model_acc_2;
 		std::vector<std::pair<int,float>> model_acc_3;
-		ifs.open(dirname1+"model_acc_test_only.ser");
-		boost::archive::text_iarchive ia_model_1(ifs);
-		ia_model_1 & model_acc_1;
+//		ifs.open(dirname1+"model_acc_test_only.ser");
+//		boost::archive::text_iarchive ia_model_1(ifs);
+//		ia_model_1 & model_acc_1;
 		gp << "set xrange [0:3000]\nset yrange [0:0.2]\n";
 		gp << "set terminal x11 5\n";
-		gp << "plot" << gp.file1d(model_acc_1) << "with lines title 'model error 1',";
-		ifs.close();
-		ifs.clear();
-		ifs.open(dirname2+"model_acc_test_only.ser");
-		boost::archive::text_iarchive ia_model_2(ifs);
-		ia_model_2 & model_acc_2;
-		gp << gp.file1d(model_acc_2) << "with lines title 'model error 2',";
-		ifs.close();
-		ifs.clear();
-		ifs.open(dirname3+"model_acc_test_only.ser");
+		gp << "plot";
+//		gp << gp.file1d(model_acc_1) << "with lines title 'model error 1',";
+//		ifs.close();
+//		ifs.clear();
+//		ifs.open(dirname2+"model_acc_test_only.ser");
+//		boost::archive::text_iarchive ia_model_2(ifs);
+//		ia_model_2 & model_acc_2;
+//		gp << gp.file1d(model_acc_2) << "with lines title 'model error 2',";
+//		ifs.close();
+//		ifs.clear();
+		ifs.open(dirname+"model_acc_test.ser");
 		boost::archive::text_iarchive ia_model_3(ifs);
 		ia_model_3 & model_acc_3;
 		gp << gp.file1d(model_acc_3) << "with lines title 'model error 3'"<<std::endl;
+		ifs.close();
+		ifs.clear();
+	}
+
+	if (MODEL_ACC_R) {
+		std::vector<std::pair<int,float>> model_acc_r;
+		//std::vector<std::pair<int,float>> model_acc_3;
+		ifs.open(dirname+"model_acc_test_r.ser");
+		boost::archive::text_iarchive ia_model_1(ifs);
+		ia_model_1 & model_acc_r;
+		gp << "set xrange [0:30000]\nset yrange [0:30]\n";
+		gp << "set terminal x11 2\n";
+		gp << "plot";
+		gp << gp.file1d(model_acc_r) << "with lines title 'reward error test'";
+		gp << std::endl;
+		ifs.close();
+		ifs.clear();
 	}
 
 	if (ACCU_R) {
@@ -178,7 +194,7 @@ int main() {
 		ifs.open(dirname+"accumulated_rewards.ser");
 		boost::archive::text_iarchive ia_r(ifs);
 		ia_r & accu_r;
-		gp << "set xrange [0:50000]\nset yrange [0:100000]\n";
+		gp << "set xrange [0:30000]\nset yrange [0:100000]\n";
 		gp << "set terminal x11 6\n";
 		gp << "plot" << gp.file1d(accu_r) << "with lines title 'accumultaed reward'"<<std::endl;
 		ifs.close();
