@@ -44,12 +44,43 @@ int main() {
 	bool ACCU_R = true;
 	bool ACCU_TUTOR_R = false;
 
+	std::string basedir = "../myTexplore/texplore_s_dep_tutor_14_20_2_";
+	std::list<std::string> dirnames = {"n_10.000000_tb_0.000000_pretrain_0_"};
+	dirnames.push_back("v_5.000000_n_5.000000_tb_10.000000_pretrain_2000_");
+	dirnames.push_back("v_5.000000_n_5.000000_tb_10.000000_pretrain_0_");
+	dirnames.push_back("v_50.000000_tb_0.000000_pretrain_0_");
+	dirnames.push_back("v_10.000000_tb_0.000000_pretrain_0_");
+	dirnames.push_back("v_10.000000_n_10.000000_tb_10.000000_pretrain_0_");
+	dirnames.push_back("tb_50.000000_pretrain_0_");
+	dirnames.push_back("tb_10.000000_pretrain_0_");
+	dirnames.push_back("n_50.000000_tb_0.000000_pretrain_0_");
+	dirnames.push_back("n_2.000000_tb_20.000000_pretrain_2000_");
+	dirnames.push_back("n_10.000000_tb_0.000000_pretrain_0_");
+	dirnames.push_back("n_10.000000_tb_0.000000_pretrain_0_");
 
-	std::string dirname = "../myTexplore/texplore_no_tutor_14_19_2_n_10.000000_lambda_0.100000_alpha_0.500000_df_0.990000_";
 	std::string name;
 	std::ifstream ifs;
+	int numdir = dirnames.size();
 
-	if (ACT_TRY){
+	for (int i=0; i<NUMACTIONS; i++){
+		gp << "set xrange [0:15000]\nset yrange [0:0.5]\n";
+		gp << "set title '" << actions[i] << "'\n";
+		gp << "set terminal x11 "<< i <<" \n";
+		gp << "plot";
+		for (auto dirname: dirnames){
+			name = basedir+dirname+"model_acc_";
+			std::vector<std::pair<float,float>> graph;
+			ifs.open(name+actions[i]+".ser");
+			boost::archive::text_iarchive ia(ifs);
+			ia & graph;
+			ifs.close();
+			ifs.clear();
+			gp << gp.file1d(graph) << "with lines title '"<< dirname <<"',";
+		}
+		gp << std::endl;
+	}
+
+/*	if (ACT_TRY){
 		std::vector<std::vector<std::pair<float,float>>> act_try(NUMACTIONS);
 
 
@@ -72,33 +103,11 @@ int main() {
 			gp << gp.file1d(act_try[i]) << "with lines title 'act_try_" << actions[i] <<"',";
 		}
 		gp << std::endl;
-	}
+	}*/
 
-	if (ACT_ACC){
-		std::vector<std::vector<std::pair<float,float>>> act_acc(NUMACTIONS);
-		name = dirname+"model_acc_";
-		for (int i=0; i<NUMACTIONS; i++){
-			ifs.open(name+actions[i]+".ser");
-			boost::archive::text_iarchive ia(ifs);
-			ia & act_acc[i];
-			ifs.close();
-			ifs.clear();
-		}
 
-		gp << "set xrange [0:30000]\nset yrange [0:0.5]\n";
-		gp << "set terminal x11 1\n";
-		// Data will be sent via a temporary file.  These are erased when you call
-		// gp.clearTmpfiles() or when gp goes out of scope.  If you pass a filename
-		// (e.g. "gp.file1d(pts, 'mydata.dat')"), then the named file will be created
-		// and won't be deleted (this is useful when creating a script).
-		gp << "plot";
-		for (int i=0; i<NUMACTIONS; i++){
-			gp << gp.file1d(act_acc[i]) << "with lines title 'act_acc_" << actions[i]<<"',";
-		}
-		gp << std::endl;
-	}
 
-	if (ACT_SUC){
+	/*if (ACT_SUC){
 		std::vector<std::vector<std::pair<float,float>>> act_suc(NUMACTIONS);
 		name = dirname+"act_succes_";
 		for (int i=0; i<NUMACTIONS; i++){
@@ -122,8 +131,8 @@ int main() {
 		}
 		gp << std::endl;
 	}
-
-	if (BLOCKS_IN){
+*/
+/*	if (BLOCKS_IN){
 		std::vector<std::pair<float,float>> blocks_in;
 		ifs.open(dirname+"blocks_in.ser");
 		boost::archive::text_iarchive ia_in(ifs);
@@ -145,9 +154,9 @@ int main() {
 		gp << "plot" << gp.file1d(blocks_right) << "with lines title 'blocks_right'"<<std::endl;
 		ifs.close();
 		ifs.clear();
-	}
+	}*/
 
-	if (MODEL_ACC) {
+/*	if (MODEL_ACC) {
 		std::vector<std::pair<int,float>> model_acc_1;
 		std::vector<std::pair<int,float>> model_acc_2;
 		std::vector<std::pair<int,float>> model_acc_3;
@@ -172,36 +181,41 @@ int main() {
 		gp << gp.file1d(model_acc_3) << "with lines title 'model error 3'"<<std::endl;
 		ifs.close();
 		ifs.clear();
-	}
+	}*/
 
-	if (MODEL_ACC_R) {
-		std::vector<std::pair<int,float>> model_acc_r;
-		//std::vector<std::pair<int,float>> model_acc_3;
-		ifs.open(dirname+"model_acc_test_r.ser");
-		boost::archive::text_iarchive ia_model_1(ifs);
-		ia_model_1 & model_acc_r;
-		gp << "set xrange [0:30000]\nset yrange [0:30]\n";
-		gp << "set terminal x11 2\n";
-		gp << "plot";
-		gp << gp.file1d(model_acc_r) << "with lines title 'reward error test'";
-		gp << std::endl;
+	gp << "set xrange [0:15000]\nset yrange [0:20]\n";
+	gp << "set title 'Reward model error'\n";
+	gp << "set terminal x11 "<< NUMACTIONS <<" \n";
+	gp << "plot";
+	for (auto dirname: dirnames){
+		name = basedir+dirname+"model_acc_test_r.ser";
+		std::vector<std::pair<float,float>> graph;
+		ifs.open(name);
+		boost::archive::text_iarchive ia(ifs);
+		ia & graph;
 		ifs.close();
 		ifs.clear();
+		gp << gp.file1d(graph) << "with lines title '"<< dirname <<"',";
 	}
+	gp << std::endl;
 
-	if (ACCU_R) {
-		std::list<std::pair<float,float>> accu_r;
-		ifs.open(dirname+"accumulated_rewards.ser");
-		boost::archive::text_iarchive ia_r(ifs);
-		ia_r & accu_r;
-		gp << "set xrange [0:30000]\nset yrange [0:100000]\n";
-		gp << "set terminal x11 6\n";
-		gp << "plot" << gp.file1d(accu_r) << "with lines title 'accumultaed reward'"<<std::endl;
+	gp << "set xrange [0:15000]\nset yrange [0:2500]\n";
+	gp << "set title 'Cumulative reward'\n";
+	gp << "set terminal x11 "<< NUMACTIONS+1 <<" \n";
+	gp << "plot";
+	for (auto dirname: dirnames){
+		name = basedir+dirname+"accumulated_rewards.ser";
+		std::vector<std::pair<float,float>> graph;
+		ifs.open(name);
+		boost::archive::text_iarchive ia(ifs);
+		ia & graph;
 		ifs.close();
 		ifs.clear();
+		gp << gp.file1d(graph) << "with lines title '"<< dirname <<"',";
 	}
+	gp << std::endl;
 
-	if (ACCU_TUTOR_R) {
+/*	if (ACCU_TUTOR_R) {
 		std::list<std::pair<float,float>> accu_tutor_r;
 		ifs.open(dirname+"accu_tutor_rewards.ser");
 		boost::archive::text_iarchive ia_r(ifs);
@@ -211,7 +225,7 @@ int main() {
 		gp << "plot" << gp.file1d(accu_tutor_r) << "with lines title 'accumultaed reward'"<<std::endl;
 		ifs.close();
 		ifs.clear();
-	}
+	}*/
 
 
 }
