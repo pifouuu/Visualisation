@@ -17,8 +17,6 @@
 #include <boost/serialization/utility.hpp>
 #include "../include/gnuplot-iostream.h"
 
-#define NUMACTIONS 6
-
 int main() {
 	Gnuplot gp;
 	std::vector<std::string> actions;
@@ -33,46 +31,66 @@ int main() {
 	actions.push_back(std::string("LOOK_BLUE_BLOCK_0"));
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_1"));
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_2"));
+	int NUMACTIONS = actions.size();
 
-	bool ACT_ACC = true;
+	/*bool ACT_ACC = false;
 	bool ACT_TRY = false;
 	bool ACT_SUC = false;
 	bool BLOCKS_IN = false;
 	bool BLOCKS_RIGHT = false;
 	bool MODEL_ACC = false;
-	bool MODEL_ACC_R = true;
+	bool MODEL_ACC_R = false;
 	bool ACCU_R = true;
-	bool ACCU_TUTOR_R = false;
+	bool ACCU_TUTOR_R = false;*/
 
-	std::string basedir = "../myTexplore/texplore_s_dep_tutor_14_20_2_";
-	std::list<std::string> dirnames = {"n_10.000000_tb_0.000000_pretrain_0_"};
-	dirnames.push_back("v_5.000000_n_5.000000_tb_10.000000_pretrain_2000_");
-	dirnames.push_back("v_5.000000_n_5.000000_tb_10.000000_pretrain_0_");
-	dirnames.push_back("v_50.000000_tb_0.000000_pretrain_0_");
-	dirnames.push_back("v_10.000000_tb_0.000000_pretrain_0_");
-	dirnames.push_back("v_10.000000_n_10.000000_tb_10.000000_pretrain_0_");
-	dirnames.push_back("tb_50.000000_pretrain_0_");
-	dirnames.push_back("tb_10.000000_pretrain_0_");
-	dirnames.push_back("n_50.000000_tb_0.000000_pretrain_0_");
-	dirnames.push_back("n_2.000000_tb_20.000000_pretrain_2000_");
-	dirnames.push_back("n_10.000000_tb_0.000000_pretrain_0_");
-	dirnames.push_back("n_10.000000_tb_0.000000_pretrain_0_");
+	std::string basedir = "../myTexplore/";
+	std::list<std::string> dirnames;
+	dirnames.push_back("texplore_s_dep_tutor_14_20_2_n_10.000000_tb_0.000000_pretrain_0_");
+//	dirnames.push_back("texplore_s_dep_tutor_14_20_2_n_2.000000_tb_20.000000_pretrain_2000_");
+	dirnames.push_back("texplore_s_dep_tutor_14_20_2_n_50.000000_tb_0.000000_pretrain_0_");
+	dirnames.push_back("texplore_s_dep_tutor_14_20_2_tb_10.000000_pretrain_0_");
+	dirnames.push_back("texplore_s_dep_tutor_14_20_2_tb_50.000000_pretrain_0_");
+	dirnames.push_back("texplore_s_dep_tutor_14_20_2_tb_50.000000_pretrain_0_");
+	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_10.000000_n_10.000000_tb_10.000000_pretrain_0_");
+	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_10.000000_tb_0.000000_pretrain_0_");
+	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_30.000000_n_30.000000_tb_50.000000_pretrain_0_fR_100.000000_");
+//	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_30.000000_n_30.000000_tb_50.000000_pretrain_1000_fR_100.000000_");
+//	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_30.000000_n_30.000000_tb_50.000000_pretrain_2000_fR_100.000000_");
+	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_50.000000_tb_0.000000_pretrain_0_");
+	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_5.000000_n_5.000000_tb_10.000000_pretrain_0_");
+//	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_5.000000_n_5.000000_tb_10.000000_pretrain_2000_");
+	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_30.000000_n_30.000000_tb_50.000000_pretrain_0_fR_100.000000_");
+
+//	dirnames.push_back("_v_30.000000_tb_0.000000_pretrain_1000_fR_100.000000_nbR_2_nbB_2_");
+//	dirnames.push_back("_v_30.000000_n_30.000000_tb_10.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
+//	dirnames.push_back("_v_30.000000_n_30.000000_tb_0.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
+//	dirnames.push_back("_v_30.000000_n_10.000000_tb_30.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
+//	dirnames.push_back("_v_10.000000_n_30.000000_tb_30.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
+//	dirnames.push_back("_tb_30.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
+//	dirnames.push_back("_tb_30.000000_pretrain_1000_fR_100.000000_nbR_2_nbB_2_");
+//	dirnames.push_back("_tb_0.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
+//	dirnames.push_back("_tb_0.000000_pretrain_1000_fR_100.000000_nbR_2_nbB_2_");
+//	dirnames.push_back("_tb_0.000000_pretrain_1000_fR_100.000000_nbR_1_nbB_1_");
+//	dirnames.push_back("_n_30.000000_tb_0.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
+//	dirnames.push_back("_n_30.000000_tb_0.000000_pretrain_1000_fR_100.000000_nbR_2_nbB_2_");
 
 	std::string name;
 	std::ifstream ifs;
 	int numdir = dirnames.size();
 
 	for (int i=0; i<NUMACTIONS; i++){
-		gp << "set xrange [0:15000]\nset yrange [0:0.5]\n";
+		gp << "set xrange [-2000:15000]\nset yrange [0:0.5]\n";
 		gp << "set title '" << actions[i] << "'\n";
 		gp << "set terminal x11 "<< i <<" \n";
 		gp << "plot";
 		for (auto dirname: dirnames){
 			name = basedir+dirname+"model_acc_";
 			std::vector<std::pair<float,float>> graph;
+
 			ifs.open(name+actions[i]+".ser");
 			boost::archive::text_iarchive ia(ifs);
 			ia & graph;
+			std::cout << name << graph.size() <<std::endl;
 			ifs.close();
 			ifs.clear();
 			gp << gp.file1d(graph) << "with lines title '"<< dirname <<"',";
@@ -183,23 +201,25 @@ int main() {
 		ifs.clear();
 	}*/
 
-	gp << "set xrange [0:15000]\nset yrange [0:20]\n";
+	gp << "set xrange [-2000:15000]\nset yrange [0:20]\n";
 	gp << "set title 'Reward model error'\n";
 	gp << "set terminal x11 "<< NUMACTIONS <<" \n";
 	gp << "plot";
 	for (auto dirname: dirnames){
 		name = basedir+dirname+"model_acc_test_r.ser";
 		std::vector<std::pair<float,float>> graph;
+
 		ifs.open(name);
 		boost::archive::text_iarchive ia(ifs);
 		ia & graph;
+		std::cout << name << graph.size() <<std::endl;
 		ifs.close();
 		ifs.clear();
 		gp << gp.file1d(graph) << "with lines title '"<< dirname <<"',";
 	}
 	gp << std::endl;
 
-	gp << "set xrange [0:15000]\nset yrange [0:2500]\n";
+	gp << "set xrange [-2000:15000]\nset yrange [0:2500]\n";
 	gp << "set title 'Cumulative reward'\n";
 	gp << "set terminal x11 "<< NUMACTIONS+1 <<" \n";
 	gp << "plot";
@@ -209,6 +229,7 @@ int main() {
 		ifs.open(name);
 		boost::archive::text_iarchive ia(ifs);
 		ia & graph;
+		std::cout << name << graph.size() <<std::endl;
 		ifs.close();
 		ifs.clear();
 		gp << gp.file1d(graph) << "with lines title '"<< dirname <<"',";
