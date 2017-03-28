@@ -43,6 +43,34 @@ int main() {
 	bool ACCU_R = true;
 	bool ACCU_TUTOR_R = false;*/
 
+/*	fs::path basedir("../myTexplore/resultats/");
+	  fs::directory_iterator end_iter;
+
+	  typedef std::multimap<std::time_t, fs::path> result_set_t;
+	  result_set_t dirnames;
+
+	  if ( fs::exists(basedir) && fs::is_directory(basedir))
+	  {
+	    for( fs::directory_iterator dir_iter(basedir) ; dir_iter != end_iter ; ++dir_iter)
+	    {
+	        result_set.insert(result_set_t::value_type(fs::last_write_time(dir_iter->path()), *dir_iter));
+	    }
+	  }
+	  if(fs::is_directory(basedir)) {
+	    std::cout << basedir << " is a directory containing:\n";
+
+	    for(auto& entry : boost::make_iterator_range(fs::directory_iterator(basedir), {})){
+	//      std::cout << entry << "\n";
+	      dirnames.insert(result_set_t::value_type(fs::last_write_time(entry), entry));
+	    }
+	  }
+	  auto folder = dirnames.rbegin();
+	  auto myEnd = std::next(result_set.rbegin(),);
+	  while (folder != myEnd && folder != dirnames.rend()){
+	    std::cout << folder->second << std::endl;
+	    ++folder;
+	  }*/
+
 	std::string basedir = "../myTexplore/";
 	std::list<std::string> dirnames;
 	dirnames.push_back("texplore_s_dep_tutor_14_20_2_n_10.000000_tb_0.000000_pretrain_0_");
@@ -225,6 +253,23 @@ int main() {
 	gp << "plot";
 	for (auto dirname: dirnames){
 		name = basedir+dirname+"accumulated_rewards.ser";
+		std::vector<std::pair<float,float>> graph;
+		ifs.open(name);
+		boost::archive::text_iarchive ia(ifs);
+		ia & graph;
+		std::cout << name << graph.size() <<std::endl;
+		ifs.close();
+		ifs.clear();
+		gp << gp.file1d(graph) << "with lines title '"<< dirname <<"',";
+	}
+	gp << std::endl;
+
+	gp << "set xrange [-2000:15000]\nset yrange [0:2500]\n";
+	gp << "set title 'Cumulative tutor reward'\n";
+	gp << "set terminal x11 "<< NUMACTIONS+1 <<" \n";
+	gp << "plot";
+	for (auto dirname: dirnames){
+		name = basedir+dirname+"accu_tutor_rewards.ser";
 		std::vector<std::pair<float,float>> graph;
 		ifs.open(name);
 		boost::archive::text_iarchive ia(ifs);
