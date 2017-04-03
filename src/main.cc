@@ -17,6 +17,11 @@
 #include <boost/serialization/utility.hpp>
 #include "../include/gnuplot-iostream.h"
 
+#include <boost/regex.hpp>
+#include <boost/algorithm/string/replace.hpp>
+
+
+
 int main() {
 	Gnuplot gp;
 	std::vector<std::string> actions;
@@ -71,40 +76,45 @@ int main() {
 	    ++folder;
 	  }*/
 
-	std::string basedir = "../myTexplore/";
-	std::list<std::string> dirnames;
-	dirnames.push_back("texplore_s_dep_tutor_14_20_2_n_10.000000_tb_0.000000_pretrain_0_");
-//	dirnames.push_back("texplore_s_dep_tutor_14_20_2_n_2.000000_tb_20.000000_pretrain_2000_");
-	dirnames.push_back("texplore_s_dep_tutor_14_20_2_n_50.000000_tb_0.000000_pretrain_0_");
-	dirnames.push_back("texplore_s_dep_tutor_14_20_2_tb_10.000000_pretrain_0_");
-	dirnames.push_back("texplore_s_dep_tutor_14_20_2_tb_50.000000_pretrain_0_");
-	dirnames.push_back("texplore_s_dep_tutor_14_20_2_tb_50.000000_pretrain_0_");
-	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_10.000000_n_10.000000_tb_10.000000_pretrain_0_");
-	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_10.000000_tb_0.000000_pretrain_0_");
-	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_30.000000_n_30.000000_tb_50.000000_pretrain_0_fR_100.000000_");
-//	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_30.000000_n_30.000000_tb_50.000000_pretrain_1000_fR_100.000000_");
-//	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_30.000000_n_30.000000_tb_50.000000_pretrain_2000_fR_100.000000_");
-	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_50.000000_tb_0.000000_pretrain_0_");
-	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_5.000000_n_5.000000_tb_10.000000_pretrain_0_");
-//	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_5.000000_n_5.000000_tb_10.000000_pretrain_2000_");
-	dirnames.push_back("texplore_s_dep_tutor_14_20_2_v_30.000000_n_30.000000_tb_50.000000_pretrain_0_fR_100.000000_");
 
-//	dirnames.push_back("_v_30.000000_tb_0.000000_pretrain_1000_fR_100.000000_nbR_2_nbB_2_");
-//	dirnames.push_back("_v_30.000000_n_30.000000_tb_10.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
-//	dirnames.push_back("_v_30.000000_n_30.000000_tb_0.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
-//	dirnames.push_back("_v_30.000000_n_10.000000_tb_30.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
-//	dirnames.push_back("_v_10.000000_n_30.000000_tb_30.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
-//	dirnames.push_back("_tb_30.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
-//	dirnames.push_back("_tb_30.000000_pretrain_1000_fR_100.000000_nbR_2_nbB_2_");
-//	dirnames.push_back("_tb_0.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
-//	dirnames.push_back("_tb_0.000000_pretrain_1000_fR_100.000000_nbR_2_nbB_2_");
-//	dirnames.push_back("_tb_0.000000_pretrain_1000_fR_100.000000_nbR_1_nbB_1_");
-//	dirnames.push_back("_n_30.000000_tb_0.000000_pretrain_500_fR_100.000000_nbR_1_nbB_1_");
-//	dirnames.push_back("_n_30.000000_tb_0.000000_pretrain_1000_fR_100.000000_nbR_2_nbB_2_");
+
+	std::string basedir = "../myTexplore/resultats_2/";
+	std::list<std::string> dirnames;
+	dirnames.push_back("03-04-2017_14-03-39_v_0_n_50_tb_0_pretrain_25_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_00-30-47_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_00-37-41_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_00-41-20_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_00-46-07_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_00-51-31_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_00-57-17_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-02-32_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-07-52_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-12-06_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-16-42_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-22-29_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-26-29_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-30-45_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-37-02_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-42-09_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-48-37_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-52-17_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_01-56-40_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_02-01-31_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_02-06-00_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_02-10-47_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_02-14-36_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_02-18-46_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_02-23-39_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_02-29-13_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_02-34-42_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_02-40-05_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_02-44-59_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("01-04-2017_02-48-48_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
 
 	std::string name;
 	std::ifstream ifs;
 	int numdir = dirnames.size();
+
 
 	for (int i=0; i<NUMACTIONS; i++){
 		gp << "set xrange [-2000:15000]\nset yrange [0:0.5]\n";
@@ -113,15 +123,23 @@ int main() {
 		gp << "plot";
 		for (auto dirname: dirnames){
 			name = basedir+dirname+"model_acc_";
-			std::vector<std::pair<float,float>> graph;
+			std::vector<float> graph;
+			std::vector<int> x_axis;
 
 			ifs.open(name+actions[i]+".ser");
-			boost::archive::text_iarchive ia(ifs);
-			ia & graph;
-			std::cout << name << graph.size() <<std::endl;
+			boost::archive::text_iarchive graph_archive(ifs);
+			graph_archive & graph;
 			ifs.close();
 			ifs.clear();
-			gp << gp.file1d(graph) << "with lines title '"<< dirname <<"',";
+
+			ifs.open(basedir+dirname+"x_axis.ser");
+			boost::archive::text_iarchive axis_archive(ifs);
+			axis_archive & x_axis;
+			ifs.close();
+			ifs.clear();
+
+			gp.send1d(boost::make_tuple(x_axis,graph));
+			gp << "with lines title '"<< dirname <<"',";
 		}
 		gp << std::endl;
 	}
@@ -266,7 +284,7 @@ int main() {
 
 	gp << "set xrange [-2000:15000]\nset yrange [0:2500]\n";
 	gp << "set title 'Cumulative tutor reward'\n";
-	gp << "set terminal x11 "<< NUMACTIONS+1 <<" \n";
+	gp << "set terminal x11 "<< NUMACTIONS+2 <<" \n";
 	gp << "plot";
 	for (auto dirname: dirnames){
 		name = basedir+dirname+"accu_tutor_rewards.ser";
