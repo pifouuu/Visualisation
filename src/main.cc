@@ -20,7 +20,21 @@
 #include <boost/regex.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
+#include <algorithm>
+#include <functional>
 
+template <typename T>
+std::vector<T> operator+(const std::vector<T>& a, const std::vector<T>& b)
+{
+    assert(a.size() == b.size());
+
+    std::vector<T> result;
+    result.reserve(a.size());
+
+    std::transform(a.begin(), a.end(), b.begin(),
+                   std::back_inserter(result), std::plus<T>());
+    return result;
+}
 
 int main() {
 	Gnuplot gp;
@@ -80,7 +94,7 @@ int main() {
 
 	std::string basedir = "../myTexplore/resultats_2/";
 	std::list<std::string> dirnames;
-	dirnames.push_back("04-04-2017_11-26-50_v_0_n_50_tb_0_pretrain_25_fR_100_nbR_0_nbB_1/");
+	dirnames.push_back("05-04-2017_16-27-05_v_30_n_10_tb_50_pretrain_500_fR_100_nbR_0_nbB_1/");
 //	dirnames.push_back("01-04-2017_00-30-47_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
 //	dirnames.push_back("01-04-2017_00-37-41_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
 //	dirnames.push_back("01-04-2017_00-41-20_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
@@ -117,7 +131,7 @@ int main() {
 
 
 	for (int i=0; i<NUMACTIONS; i++){
-		gp << "set xrange [-2000:15000]\nset yrange [0:0.5]\n";
+		gp << "set xrange [-500:3000]\nset yrange [0:3]\n";
 		gp << "set title '" << actions[i] << "'\n";
 		gp << "set terminal x11 "<< i <<" \n";
 
@@ -273,7 +287,7 @@ int main() {
 	}
 	gp << std::endl;
 
-	gp << "set xrange [-2000:15000]\nset yrange [0:2500]\n";
+	gp << "set xrange [-500:3000]\nset yrange [0:500]\n";
 	gp << "set title 'Cumulative reward'\n";
 	gp << "set terminal x11 "<< NUMACTIONS+1 <<" \n";
 	for (auto dirname: dirnames){
@@ -299,7 +313,7 @@ int main() {
 	}
 	gp << std::endl;
 
-	gp << "set xrange [-2000:15000]\nset yrange [0:2500]\n";
+	gp << "set xrange [-500:3000]\nset yrange [0:500]\n";
 	gp << "set title 'Cumulative tutor reward'\n";
 	gp << "set terminal x11 "<< NUMACTIONS+2 <<" \n";
 	for (auto dirname: dirnames){
@@ -321,6 +335,56 @@ int main() {
 
 		gp << "plot '-' with lines title '"<< dirname <<"'\n";
 		gp.send1d(boost::make_tuple(x_axis,graph));
+	}
+	gp << std::endl;
+
+	gp << "set xrange [-500:3000]\nset yrange [0:0.5]\n";
+	gp << "set title 'Q values content'\n";
+	gp << "set terminal x11 "<< NUMACTIONS+3 <<" \n";
+	for (auto dirname: dirnames){
+		std::vector<float> graph_reward;
+		std::vector<float> graph_sync;
+		std::vector<float> graph_var;
+		std::vector<float> graph_nov;
+		std::vector<int> x_axis;
+
+		ifs.open(basedir+dirname+"reward_prop.ser");
+		boost::archive::text_iarchive reward_archive(ifs);
+		reward_archive & graph_reward;
+		ifs.close();
+		ifs.clear();
+
+		ifs.open(basedir+dirname+"sync_prop.ser");
+		boost::archive::text_iarchive sync_archive(ifs);
+		sync_archive & graph_sync;
+		ifs.close();
+		ifs.clear();
+
+		ifs.open(basedir+dirname+"var_prop.ser");
+		boost::archive::text_iarchive var_archive(ifs);
+		var_archive & graph_var;
+		ifs.close();
+		ifs.clear();
+
+		ifs.open(basedir+dirname+"nov_prop.ser");
+		boost::archive::text_iarchive nov_archive(ifs);
+		nov_archive & graph_nov;
+		ifs.close();
+		ifs.clear();
+
+		ifs.open(basedir+dirname+"x_axis.ser");
+		boost::archive::text_iarchive axis_archive(ifs);
+		axis_archive & x_axis;
+		ifs.close();
+		ifs.clear();
+
+		gp << "plot '-' with lines title 'external reward', '-' with lines title 'sync bonus', "
+				"'-' with lines title 'variance bonus', '-' with lines title 'novelty bonus'\n";
+		gp.send1d(boost::make_tuple(x_axis,graph_reward));
+		gp.send1d(boost::make_tuple(x_axis,graph_reward));
+		gp.send1d(boost::make_tuple(x_axis,graph_var));
+		gp.send1d(boost::make_tuple(x_axis,graph_nov));
+
 	}
 	gp << std::endl;
 
