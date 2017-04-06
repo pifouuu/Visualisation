@@ -20,6 +20,8 @@
 #include <boost/regex.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
+#include "../include/exponential_smoothing.hpp"
+
 #include <algorithm>
 #include <functional>
 
@@ -34,6 +36,15 @@ std::vector<T> operator+(const std::vector<T>& a, const std::vector<T>& b)
     std::transform(a.begin(), a.end(), b.begin(),
                    std::back_inserter(result), std::plus<T>());
     return result;
+}
+
+std::vector<float> expo_smooth(std::vector<float>& raw, float alpha){
+	std::vector<float> smooth;
+	smooth.push_back(raw[0]);
+	for (int i=1;i<raw.size();i++){
+		smooth.push_back(alpha*raw[i]+(1-alpha)*smooth[i-1]);
+	}
+	return smooth;
 }
 
 int main() {
@@ -129,7 +140,6 @@ int main() {
 	std::ifstream ifs;
 	int numdir = dirnames.size();
 
-
 	for (int i=0; i<NUMACTIONS; i++){
 		gp << "set xrange [-500:3000]\nset yrange [0:3]\n";
 		gp << "set title '" << actions[i] << "'\n";
@@ -152,12 +162,12 @@ int main() {
 			ifs.close();
 			ifs.clear();
 
-
 			gp << "plot '-' with lines title '"<< dirname <<"'\n";
 			gp.send1d(boost::make_tuple(x_axis,graph));
 		}
 		gp << std::endl;
 	}
+
 
 /*	if (ACT_TRY){
 		std::vector<std::vector<std::pair<float,float>>> act_try(NUMACTIONS);
@@ -264,7 +274,7 @@ int main() {
 
 	gp << "set xrange [-2000:15000]\nset yrange [0:20]\n";
 	gp << "set title 'Reward model error'\n";
-	gp << "set terminal x11 "<< NUMACTIONS <<" \n";
+	gp << "set terminal x11 "<< NUMACTIONS+1 <<" \n";
 	for (auto dirname: dirnames){
 		name = basedir+dirname+"reward_model_acc.ser";
 		std::vector<float> graph;
@@ -289,7 +299,7 @@ int main() {
 
 	gp << "set xrange [-500:3000]\nset yrange [0:500]\n";
 	gp << "set title 'Cumulative reward'\n";
-	gp << "set terminal x11 "<< NUMACTIONS+1 <<" \n";
+	gp << "set terminal x11 "<< NUMACTIONS+2 <<" \n";
 	for (auto dirname: dirnames){
 
 		name = basedir+dirname+"accumulated_reward.ser";
@@ -315,7 +325,7 @@ int main() {
 
 	gp << "set xrange [-500:3000]\nset yrange [0:500]\n";
 	gp << "set title 'Cumulative tutor reward'\n";
-	gp << "set terminal x11 "<< NUMACTIONS+2 <<" \n";
+	gp << "set terminal x11 "<< NUMACTIONS+3 <<" \n";
 	for (auto dirname: dirnames){
 		name = basedir+dirname+"accu_tutor_rewards.ser";
 		std::vector<float> graph;
@@ -338,9 +348,9 @@ int main() {
 	}
 	gp << std::endl;
 
-	gp << "set xrange [-500:3000]\nset yrange [0:0.5]\n";
+	gp << "set xrange [-500:3000]\nset yrange [0:1]\n";
 	gp << "set title 'Q values content'\n";
-	gp << "set terminal x11 "<< NUMACTIONS+3 <<" \n";
+	gp << "set terminal x11 "<< NUMACTIONS+4 <<" \n";
 	for (auto dirname: dirnames){
 		std::vector<float> graph_reward;
 		std::vector<float> graph_sync;
@@ -378,12 +388,15 @@ int main() {
 		ifs.close();
 		ifs.clear();
 
+
+
+		float alpha = 0.1;
 		gp << "plot '-' with lines title 'external reward', '-' with lines title 'sync bonus', "
 				"'-' with lines title 'variance bonus', '-' with lines title 'novelty bonus'\n";
-		gp.send1d(boost::make_tuple(x_axis,graph_reward));
-		gp.send1d(boost::make_tuple(x_axis,graph_reward));
-		gp.send1d(boost::make_tuple(x_axis,graph_var));
-		gp.send1d(boost::make_tuple(x_axis,graph_nov));
+		gp.send1d(boost::make_tuple(x_axis,expo_smooth(graph_reward, alpha)));
+		gp.send1d(boost::make_tuple(x_axis,expo_smooth(graph_sync, alpha)));
+		gp.send1d(boost::make_tuple(x_axis,expo_smooth(graph_var, alpha)));
+		gp.send1d(boost::make_tuple(x_axis,expo_smooth(graph_nov, alpha)));
 
 	}
 	gp << std::endl;
