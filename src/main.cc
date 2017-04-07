@@ -74,9 +74,9 @@ int main() {
 	actions.push_back(std::string("PICK"));
 	//actions.push_back(std::string("PUT_DOWN"));
 	actions.push_back(std::string("PUT_IN"));
-	//actions.push_back(std::string("LOOK_RED_BLOCK_0"));
+	actions.push_back(std::string("LOOK_RED_BLOCK_0"));
 	//actions.push_back(std::string("LOOK_RED_BLOCK_1"));
-	actions.push_back(std::string("LOOK_BLUE_BLOCK_0"));
+	//actions.push_back(std::string("LOOK_BLUE_BLOCK_0"));
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_1"));
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_2"));
 	int NUMACTIONS = actions.size();
@@ -124,12 +124,12 @@ int main() {
 
 
 
-	//std::string basedir = "../myTexplore/resultats_2/";
-	std::string basedir = "/home/pierre/Dropbox/resultats/";
+	std::string basedir = "../myTexplore/resultats_2/";
+	//std::string basedir = "/home/pierre/Dropbox/resultats/";
 	std::vector<std::string> dirnames;
-	dirnames.push_back("06-04-2017_14-28-05_v_30_n_10_tb_50_pretrain_200_fR_100_nbR_0_nbB_1/");
-	dirnames.push_back("06-04-2017_14-12-47_v_30_n_10_tb_0_pretrain_200_fR_100_nbR_0_nbB_1/");
-//	dirnames.push_back("01-04-2017_00-37-41_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+	dirnames.push_back("06-04-2017_19-49-26_v_0_n_50_tb_0_pretrain_500_fR_100_nbR_1_nbB_0/");
+	dirnames.push_back("06-04-2017_21-54-47_v_50_n_0_tb_0_pretrain_500_fR_100_nbR_1_nbB_0/");
+	dirnames.push_back("07-04-2017_00-22-37_v_0_n_0_tb_50_pretrain_500_fR_100_nbR_1_nbB_0/");
 //	dirnames.push_back("01-04-2017_00-41-20_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
 //	dirnames.push_back("01-04-2017_00-46-07_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
 //	dirnames.push_back("01-04-2017_00-51-31_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
@@ -163,7 +163,7 @@ int main() {
 	int numdir = dirnames.size();
 
 	for (int i=0; i<NUMACTIONS; i++){
-		gp << "set xrange [-200:3000]\nset yrange [0:0.3]\n";
+		gp << "set xrange [-500:3000]\nset yrange [0:0.3]\n";
 		gp << "set title '" << actions[i] << "'\n";
 		gp << "set terminal x11 "<< i <<" \n";
 		gp << "plot";
@@ -189,6 +189,39 @@ int main() {
 		gp << std::endl;
 	}
 
+	gp << "set xrange [-500:3000]\nset yrange [0:0.3]\n";
+	gp << "set title 'global model'\n";
+	gp << "set terminal x11 "<< NUMACTIONS+4+dirnames.size() <<" \n";
+	gp << "plot";
+	for (auto dirname: dirnames){
+
+		std::vector<int> x_axis;
+		ifs.open(basedir+dirname+"x_axis.ser");
+		boost::archive::text_iarchive axis_archive(ifs);
+		axis_archive & x_axis;
+		ifs.close();
+		ifs.clear();
+
+		std::vector<float> graph_tot(x_axis.size(),0.);
+
+		name = basedir+dirname+"model_acc_";
+
+		for (int i=0;i<NUMACTIONS;i++){
+			std::vector<float> graph;
+			ifs.open(name+actions[i]+".ser");
+			boost::archive::text_iarchive graph_archive(ifs);
+			graph_archive & graph;
+			ifs.close();
+			ifs.clear();
+			graph_tot = graph_tot+graph;
+		}
+
+		for (int i=0;i<graph_tot.size();i++){
+			graph_tot[i]/=NUMACTIONS;
+		}
+		gp << gp.file1d(boost::make_tuple(x_axis,expo_smooth(graph_tot,alpha))) << "with lines title '"<< dirname <<"',";
+	}
+	gp << std::endl;
 
 /*	if (ACT_TRY){
 		std::vector<std::vector<std::pair<float,float>>> act_try(NUMACTIONS);
@@ -293,7 +326,7 @@ int main() {
 		ifs.clear();
 	}*/
 
-	gp << "set xrange [-200:3000]\nset yrange [0:0.1]\n";
+	gp << "set xrange [-500:3000]\nset yrange [0:0.1]\n";
 	gp << "set title 'Reward model error'\n";
 	gp << "set terminal x11 "<< NUMACTIONS+1 <<" \n";
 	gp << "plot";
@@ -318,7 +351,7 @@ int main() {
 	}
 	gp << std::endl;
 
-	gp << "set xrange [-200:3000]\nset yrange [0:250]\n";
+	gp << "set xrange [-500:3000]\nset yrange [-1000:0]\n";
 	gp << "set title 'Cumulative reward'\n";
 	gp << "set terminal x11 "<< NUMACTIONS+2 <<" \n";
 	gp << "plot";
@@ -344,7 +377,7 @@ int main() {
 	}
 	gp << std::endl;
 
-	gp << "set xrange [-200:3000]\nset yrange [0:150]\n";
+	gp << "set xrange [-500:3000]\nset yrange [0:150]\n";
 	gp << "set title 'Cumulative tutor reward'\n";
 	gp << "set terminal x11 "<< NUMACTIONS+3 <<" \n";
 	gp << "plot";
@@ -370,7 +403,7 @@ int main() {
 	}
 	gp << std::endl;
 
-	gp << "set xrange [-200:3000]\nset yrange [0:1]\n";
+	gp << "set xrange [-500:3000]\nset yrange [0:1]\n";
 	for (int i =0;i<dirnames.size();i++){
 		gp << "set title 'Q values content : " << dirnames[i] << "'\n";
 		gp << "set terminal x11 "<< NUMACTIONS+4+i <<" \n";
