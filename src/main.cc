@@ -88,7 +88,7 @@ int main() {
 	//actions.push_back(std::string("PUT_DOWN"));
 	actions.push_back(std::string("PUT_IN"));
 //	actions.push_back(std::string("LOOK_RED_BLOCK_0"));
-	//actions.push_back(std::string("LOOK_RED_BLOCK_1"));
+//	actions.push_back(std::string("LOOK_RED_BLOCK_1"));
 	actions.push_back(std::string("LOOK_BLUE_BLOCK_0"));
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_1"));
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_2"));
@@ -140,13 +140,12 @@ int main() {
 	std::string basedir = "../myTexplore/resultats_2/";
 //	std::string basedir = "/home/pierre/Dropbox/resultats/";
 	std::vector<std::string> dirnames;
-	dirnames.push_back("08-04-2017_19-15-11_v_30_n_10_tb_0_pretrain_0_fR_100_nbR_0_nbB_1_explo1000/");
-	dirnames.push_back("08-04-2017_23-42-48_v_30_n_10_tb_50_pretrain_0_fR_100_nbR_0_nbB_1_explo1000/");
-	dirnames.push_back("09-04-2017_03-23-48_v_30_n_10_tb_10_pretrain_0_fR_100_nbR_0_nbB_1_explo1000/");
-	dirnames.push_back("09-04-2017_12-16-24_v_30_n_10_tb_30_pretrain_0_fR_100_nbR_0_nbB_1_explo1000/");
-//	dirnames.push_back("01-04-2017_01-12-06_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
-//	dirnames.push_back("01-04-2017_01-16-42_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
-//	dirnames.push_back("01-04-2017_01-22-29_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
+	dirnames.push_back("11-04-2017_23-49-33_v_0_n_0_tb_0_pretrain_0_fR_0_nbR_0_nbB_1/");
+	dirnames.push_back("12-04-2017_02-22-35_v_0_n_0_tb_0_pretrain_0_fR_100_nbR_0_nbB_1/");
+	dirnames.push_back("12-04-2017_05-26-32_v_0_n_0_tb_0_pretrain_500_fR_100_nbR_0_nbB_1/");
+	dirnames.push_back("12-04-2017_08-38-17_v_0_n_0_tb_0_pretrain_2000_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("10-04-2017_22-41-09_v_30_n_10_tb_50_pretrain_0_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("10-04-2017_21-26-13_v_30_n_10_tb_0_pretrain_0_fR_100_nbR_0_nbB_1/");
 //	dirnames.push_back("01-04-2017_01-26-29_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
 //	dirnames.push_back("01-04-2017_01-30-45_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
 //	dirnames.push_back("01-04-2017_01-37-02_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
@@ -384,7 +383,7 @@ int main() {
 	}
 	gp << std::endl;
 
-	gp << "set xrange [-500:10000]\nset yrange [0:3000]\n";
+	gp << "set xrange [-500:10000]\nset yrange [0:10000]\n";
 	gp << "set title 'Cumulative reward'\n";
 	gp << "set terminal x11 "<< NUMACTIONS+2 <<" \n";
 	gp << "plot";
@@ -418,12 +417,46 @@ int main() {
 	}
 	gp << std::endl;
 
-	gp << "set xrange [-500:10000]\nset yrange [0:3000]\n";
+	gp << "set xrange [-500:10000]\nset yrange [0:5000]\n";
 	gp << "set title 'Cumulative tutor reward'\n";
 	gp << "set terminal x11 "<< NUMACTIONS+3 <<" \n";
 	gp << "plot";
 	for (auto dirname: dirnames){
 		name = basedir+dirname+"accu_tutor_rewards.ser";
+		std::vector<float> graph;
+		std::vector<int> x_axis;
+
+		ifs.open(name);
+		boost::archive::text_iarchive ia(ifs);
+		ia & graph;
+		ifs.close();
+		ifs.clear();
+
+		ifs.open(basedir+dirname+"x_axis.ser");
+		boost::archive::text_iarchive axis_archive(ifs);
+		axis_archive & x_axis;
+		ifs.close();
+		ifs.clear();
+
+		std::vector<float> num_trials;
+		ifs.open(basedir+dirname+"num_trials.ser");
+		boost::archive::text_iarchive num_trials_archive(ifs);
+		num_trials_archive & num_trials;
+		ifs.close();
+		ifs.clear();
+		graph = div(graph,num_trials);
+
+		//gp << gp.file1d(boost::make_tuple(x_axis,avg_smooth(graph,ws))) << "with lines title '"<< dirname <<"',";
+		gp << gp.file1d(boost::make_tuple(x_axis,graph)) << "with lines title '"<< dirname <<"',";
+	}
+	gp << std::endl;
+
+	gp << "set xrange [-500:10000]\nset yrange [0:10000]\n";
+	gp << "set title 'Cumulative tutor reward 2'\n";
+	gp << "set terminal x11 "<< NUMACTIONS+4 <<" \n";
+	gp << "plot";
+	for (auto dirname: dirnames){
+		name = basedir+dirname+"accu_tutor_rewards_2.ser";
 		std::vector<float> graph;
 		std::vector<int> x_axis;
 
@@ -492,7 +525,17 @@ int main() {
 //		ifs.close();
 //		ifs.clear();
 //
+//		std::vector<float> num_trials;
+//		ifs.open(basedir+dirnames[i]+"num_trials.ser");
+//		boost::archive::text_iarchive num_trials_archive(ifs);
+//		num_trials_archive & num_trials;
+//		ifs.close();
+//		ifs.clear();
 //
+//		graph_reward = div(graph_reward,num_trials);
+//		graph_sync = div(graph_sync,num_trials);
+//		graph_var = div(graph_var,num_trials);
+//		graph_nov = div(graph_nov,num_trials);
 //
 //
 //		gp << "plot '-' with lines title 'external reward', '-' with lines title 'sync bonus', "
