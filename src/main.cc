@@ -137,11 +137,11 @@ int main() {
 
 
 
-	std::string basedir = "../myTexplore/";
+	std::string basedir = "../myTexplore/resultats_2/";
 //	std::string basedir = "/home/pierre/Dropbox/resultats/";
 	std::vector<std::string> dirnames;
-	dirnames.push_back("_tb_0.000000_pretrain_0_fR_0.000000_nbR_0_nbB_1_");
-	dirnames.push_back("_tb_0.000000_pretrain_0_fR_100.000000_nbR_0_nbB_1_");
+	dirnames.push_back("12-04-2017_14-09-27_v_0_n_0_tb_0_pretrain_10000_fR_100_nbR_0_nbB_1/");
+	dirnames.push_back("12-04-2017_13-58-36_v_0_n_0_tb_0_pretrain_10000_fR_0_nbR_0_nbB_1/");
 //	dirnames.push_back("11-04-2017_11-35-37_v_0_n_0_tb_0_pretrain_0_fR_0_nbR_0_nbB_1/");
 //	dirnames.push_back("08-04-2017_01-18-21_v_30_n_10_tb_50_pretrain_1000_fR_100_nbR_1_nbB_0/");
 //	dirnames.push_back("08-04-2017_05-53-21_v_10_n_30_tb_10_pretrain_1000_fR_100_nbR_1_nbB_0/");
@@ -170,81 +170,81 @@ int main() {
 
 
 
-//	for (int i=0; i<NUMACTIONS; i++){
-//		gp << "set xrange [-500:10000]\nset yrange [0:0.3]\n";
-//		gp << "set title '" << actions[i] << "'\n";
-//		gp << "set terminal x11 "<< i <<" \n";
-//		gp << "plot";
-//		for (auto dirname: dirnames){
-//			name = basedir+dirname+"model_acc_";
-//			std::vector<float> graph;
-//			std::vector<int> x_axis;
-//
-//			ifs.open(name+actions[i]+".ser");
-//			boost::archive::text_iarchive graph_archive(ifs);
-//			graph_archive & graph;
-//			ifs.close();
-//			ifs.clear();
-//
-//			ifs.open(basedir+dirname+"x_axis.ser");
-//			boost::archive::text_iarchive axis_archive(ifs);
-//			axis_archive & x_axis;
-//			ifs.close();
-//			ifs.clear();
-//
-//			std::vector<float> num_trials;
-//			ifs.open(basedir+dirname+"num_trials.ser");
-//			boost::archive::text_iarchive num_trials_archive(ifs);
-//			num_trials_archive & num_trials;
-//			ifs.close();
-//			ifs.clear();
-//			graph = div(graph,num_trials);
-//
-//			gp << gp.file1d(boost::make_tuple(x_axis,expo_smooth(graph,alpha))) << "with lines title '"<< dirname <<"',";
-//		}
-//		gp << std::endl;
-//	}
+	for (int i=0; i<NUMACTIONS; i++){
+		gp << "set xrange [-500:10000]\nset yrange [0:0.3]\n";
+		gp << "set title '" << actions[i] << "'\n";
+		gp << "set terminal x11 "<< i <<" \n";
+		gp << "plot";
+		for (auto dirname: dirnames){
+			name = basedir+dirname+"model_acc_";
+			std::vector<float> graph;
+			std::vector<int> x_axis;
 
-//	gp << "set xrange [-500:10000]\nset yrange [0:0.3]\n";
-//	gp << "set title 'global model'\n";
-//	gp << "set terminal x11 "<< NUMACTIONS+4+dirnames.size() <<" \n";
-//	gp << "plot";
-//	for (auto dirname: dirnames){
-//
-//		std::vector<int> x_axis;
-//		ifs.open(basedir+dirname+"x_axis.ser");
-//		boost::archive::text_iarchive axis_archive(ifs);
-//		axis_archive & x_axis;
-//		ifs.close();
-//		ifs.clear();
-//
-//		std::vector<float> graph_tot(x_axis.size(),0.);
-//
-//		name = basedir+dirname+"model_acc_";
-//
-//		for (int i=0;i<NUMACTIONS;i++){
-//			std::vector<float> graph;
-//			ifs.open(name+actions[i]+".ser");
-//			boost::archive::text_iarchive graph_archive(ifs);
-//			graph_archive & graph;
-//			ifs.close();
-//			ifs.clear();
-//			graph_tot = graph_tot+graph;
-//		}
-//
-//		for (int i=0;i<graph_tot.size();i++){
-//			graph_tot[i]/=NUMACTIONS;
-//		}
-//		std::vector<float> num_trials;
-//		ifs.open(basedir+dirname+"num_trials.ser");
-//		boost::archive::text_iarchive num_trials_archive(ifs);
-//		num_trials_archive & num_trials;
-//		ifs.close();
-//		ifs.clear();
-//		graph_tot = div(graph_tot,num_trials);
-//		gp << gp.file1d(boost::make_tuple(x_axis,expo_smooth(graph_tot,alpha))) << "with lines title '"<< dirname <<"',";
-//	}
-//	gp << std::endl;
+			ifs.open(name+actions[i]+".ser");
+			boost::archive::text_iarchive graph_archive(ifs);
+			graph_archive & graph;
+			ifs.close();
+			ifs.clear();
+
+			ifs.open(basedir+dirname+"x_axis.ser");
+			boost::archive::text_iarchive axis_archive(ifs);
+			axis_archive & x_axis;
+			ifs.close();
+			ifs.clear();
+
+			std::vector<float> num_trials;
+			ifs.open(basedir+dirname+"num_trials.ser");
+			boost::archive::text_iarchive num_trials_archive(ifs);
+			num_trials_archive & num_trials;
+			ifs.close();
+			ifs.clear();
+			graph = div(graph,num_trials);
+
+			gp << gp.file1d(boost::make_tuple(x_axis,expo_smooth(graph,alpha))) << "with lines title '"<< dirname <<"',";
+		}
+		gp << std::endl;
+	}
+
+	gp << "set xrange [-500:10000]\nset yrange [0:0.3]\n";
+	gp << "set title 'global model'\n";
+	gp << "set terminal x11 "<< NUMACTIONS+4+dirnames.size() <<" \n";
+	gp << "plot";
+	for (auto dirname: dirnames){
+
+		std::vector<int> x_axis;
+		ifs.open(basedir+dirname+"x_axis.ser");
+		boost::archive::text_iarchive axis_archive(ifs);
+		axis_archive & x_axis;
+		ifs.close();
+		ifs.clear();
+
+		std::vector<float> graph_tot(x_axis.size(),0.);
+
+		name = basedir+dirname+"model_acc_";
+
+		for (int i=0;i<NUMACTIONS;i++){
+			std::vector<float> graph;
+			ifs.open(name+actions[i]+".ser");
+			boost::archive::text_iarchive graph_archive(ifs);
+			graph_archive & graph;
+			ifs.close();
+			ifs.clear();
+			graph_tot = graph_tot+graph;
+		}
+
+		for (int i=0;i<graph_tot.size();i++){
+			graph_tot[i]/=NUMACTIONS;
+		}
+		std::vector<float> num_trials;
+		ifs.open(basedir+dirname+"num_trials.ser");
+		boost::archive::text_iarchive num_trials_archive(ifs);
+		num_trials_archive & num_trials;
+		ifs.close();
+		ifs.clear();
+		graph_tot = div(graph_tot,num_trials);
+		gp << gp.file1d(boost::make_tuple(x_axis,expo_smooth(graph_tot,alpha))) << "with lines title '"<< dirname <<"',";
+	}
+	gp << std::endl;
 
 /*	if (ACT_TRY){
 		std::vector<std::vector<std::pair<float,float>>> act_try(NUMACTIONS);
