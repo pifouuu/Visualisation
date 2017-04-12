@@ -88,7 +88,7 @@ int main() {
 	//actions.push_back(std::string("PUT_DOWN"));
 	actions.push_back(std::string("PUT_IN"));
 //	actions.push_back(std::string("LOOK_RED_BLOCK_0"));
-	//actions.push_back(std::string("LOOK_RED_BLOCK_1"));
+//	actions.push_back(std::string("LOOK_RED_BLOCK_1"));
 	actions.push_back(std::string("LOOK_BLUE_BLOCK_0"));
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_1"));
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_2"));
@@ -147,6 +147,7 @@ int main() {
 //	dirnames.push_back("08-04-2017_05-53-21_v_10_n_30_tb_10_pretrain_1000_fR_100_nbR_1_nbB_0/");
 //	dirnames.push_back("08-04-2017_07-35-04_v_10_n_30_tb_30_pretrain_1000_fR_100_nbR_1_nbB_0/");
 //	dirnames.push_back("08-04-2017_09-16-31_v_10_n_30_tb_50_pretrain_1000_fR_100_nbR_1_nbB_0/");
+
 //	dirnames.push_back("01-04-2017_01-37-02_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
 //	dirnames.push_back("01-04-2017_01-42-09_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
 //	dirnames.push_back("01-04-2017_01-48-37_v_20_n_20_tb_20_pretrain_100_fR_100_nbR_0_nbB_1/");
@@ -419,6 +420,7 @@ int main() {
 	gp << "set xrange [-500:10000]\nset yrange [0:1000]\n";
 	gp << "set title 'Cumulative tutor reward'\n";
 	gp << "set terminal x11 "<< NUMACTIONS+3 <<" \n";
+
 	gp << "plot";
 	for (auto dirname: dirnames){
 		name = basedir+dirname+"accu_tutor_rewards.ser";
@@ -450,10 +452,44 @@ int main() {
 	}
 	gp << std::endl;
 
+	gp << "set xrange [-500:10000]\nset yrange [0:10000]\n";
+	gp << "set title 'Cumulative tutor reward 2'\n";
+	gp << "set terminal x11 "<< NUMACTIONS+4 <<" \n";
+	gp << "plot";
+	for (auto dirname: dirnames){
+		name = basedir+dirname+"accu_tutor_rewards_2.ser";
+		std::vector<float> graph;
+		std::vector<int> x_axis;
+
+		ifs.open(name);
+		boost::archive::text_iarchive ia(ifs);
+		ia & graph;
+		ifs.close();
+		ifs.clear();
+
+		ifs.open(basedir+dirname+"x_axis.ser");
+		boost::archive::text_iarchive axis_archive(ifs);
+		axis_archive & x_axis;
+		ifs.close();
+		ifs.clear();
+
+		std::vector<float> num_trials;
+		ifs.open(basedir+dirname+"num_trials.ser");
+		boost::archive::text_iarchive num_trials_archive(ifs);
+		num_trials_archive & num_trials;
+		ifs.close();
+		ifs.clear();
+		graph = div(graph,num_trials);
+
+		//gp << gp.file1d(boost::make_tuple(x_axis,avg_smooth(graph,ws))) << "with lines title '"<< dirname <<"',";
+		gp << gp.file1d(boost::make_tuple(x_axis,graph)) << "with lines title '"<< dirname <<"',";
+	}
+	gp << std::endl;
+
 	gp << "set xrange [-500:10000]\nset yrange [0:1]\n";
 	for (int i =0;i<dirnames.size();i++){
 		gp << "set title 'Q values content : " << dirnames[i] << "'\n";
-		gp << "set terminal x11 "<< NUMACTIONS+4+i <<" \n";
+		gp << "set terminal x11 "<< NUMACTIONS+5+i <<" \n";
 		std::vector<float> graph_reward;
 		std::vector<float> graph_sync;
 		std::vector<float> graph_var;
@@ -496,10 +532,11 @@ int main() {
 		num_trials_archive & num_trials;
 		ifs.close();
 		ifs.clear();
+
 		graph_reward = div(graph_reward,num_trials);
 		graph_sync = div(graph_sync,num_trials);
-		graph_nov = div(graph_nov,num_trials);
 		graph_var = div(graph_var,num_trials);
+		graph_nov = div(graph_nov,num_trials);
 
 
 		gp << "plot '-' with lines title 'external reward', '-' with lines title 'sync bonus', "
@@ -512,17 +549,6 @@ int main() {
 	}
 	gp << std::endl;
 
-/*	if (ACCU_TUTOR_R) {
-		std::list<std::pair<float,float>> accu_tutor_r;
-		ifs.open(dirname+"accu_tutor_rewards.ser");
-		boost::archive::text_iarchive ia_r(ifs);
-		ia_r & accu_tutor_r;
-		gp << "set xrange [0:40000]\nset yrange [0:5000]\n";
-		gp << "set terminal x11 7\n";
-		gp << "plot" << gp.file1d(accu_tutor_r) << "with lines title 'accumultaed reward'"<<std::endl;
-		ifs.close();
-		ifs.clear();
-	}*/
 
 
 }
