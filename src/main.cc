@@ -38,19 +38,6 @@ std::vector<T> operator+(const std::vector<T>& a, const std::vector<T>& b)
     return result;
 }
 
-std::vector<float> div(const std::vector<float>& a, const std::vector<float>& b)
-{
-    assert(a.size() == b.size());
-
-    std::vector<float> result;
-
-    for (int i =0; i<a.size();i++){
-    	result.push_back(b[i]==0 ? a[i] : a[i]/b[i]);
-    }
-
-    return result;
-}
-
 std::vector<float> expo_smooth(std::vector<float>& raw, float alpha){
 	std::vector<float> smooth;
 	smooth.push_back(raw[0]);
@@ -59,6 +46,22 @@ std::vector<float> expo_smooth(std::vector<float>& raw, float alpha){
 	}
 	return smooth;
 }
+
+boost::tuple<std::vector<float>,std::vector<float>> postproc(std::vector<float>& graph, std::vector<int>& axis,
+		std::vector<float>& trials, float alpha)
+{
+    std::vector<float> result_graph;
+    std::vector<float> result_axis;
+    for (int i =0; i<graph.size();i++){
+    	if (trials[i]!=0){
+    		result_graph.push_back(graph[i]/trials[i]);
+    		result_axis.push_back(axis[i]);
+    	}
+    }
+    return boost::make_tuple(result_axis, expo_smooth(result_graph,alpha));
+}
+
+
 
 std::vector<float> avg_smooth(std::vector<float>& raw, int ws){
 	std::vector<float> smooth;
@@ -78,7 +81,7 @@ std::vector<float> avg_smooth(std::vector<float>& raw, int ws){
 	return smooth;
 }
 
-int main() {
+int main(){
 	Gnuplot gp;
 	std::vector<std::string> actions;
 	actions.push_back(std::string("GO_TO_EYE"));
@@ -94,7 +97,7 @@ int main() {
 	//actions.push_back(std::string("LOOK_BLUE_BLOCK_2"));
 	int NUMACTIONS = actions.size();
 
-	float alpha = 0.5;
+	float alpha = 0.8;
 	int ws = 10;
 
 	/*bool ACT_ACC = false;
@@ -137,13 +140,13 @@ int main() {
 
 
 
-	std::string basedir = "../myTexplore/resultats_2/";
+	std::string basedir = "../myTexplore/resultats_3/";
 //	std::string basedir = "/home/pierre/Dropbox/resultats/";
 	std::vector<std::string> dirnames;
-	dirnames.push_back("12-04-2017_14-09-27_v_0_n_0_tb_0_pretrain_10000_fR_100_nbR_0_nbB_1/");
-	dirnames.push_back("12-04-2017_13-58-36_v_0_n_0_tb_0_pretrain_10000_fR_0_nbR_0_nbB_1/");
-//	dirnames.push_back("11-04-2017_11-35-37_v_0_n_0_tb_0_pretrain_0_fR_0_nbR_0_nbB_1/");
-//	dirnames.push_back("08-04-2017_01-18-21_v_30_n_10_tb_50_pretrain_1000_fR_100_nbR_1_nbB_0/");
+//	dirnames.push_back("12-04-2017_14-09-27_v_0_n_0_tb_0_pretrain_10000_fR_100_nbR_0_nbB_1/");
+//	dirnames.push_back("12-04-2017_13-58-36_v_0_n_0_tb_0_pretrain_10000_fR_0_nbR_0_nbB_1/");
+//	dirnames.push_back("12-04-2017_16-45-09_v_0_n_0_tb_0_pretrain_10000_fR_100_nbR_0_nbB_1/");
+	dirnames.push_back("14-04-2017_14-39-08_2__v_0_n_0_tb_0_pretrain_0_fR_100_nbR_2_nbB_1/");
 //	dirnames.push_back("08-04-2017_05-53-21_v_10_n_30_tb_10_pretrain_1000_fR_100_nbR_1_nbB_0/");
 //	dirnames.push_back("08-04-2017_07-35-04_v_10_n_30_tb_30_pretrain_1000_fR_100_nbR_1_nbB_0/");
 //	dirnames.push_back("08-04-2017_09-16-31_v_10_n_30_tb_50_pretrain_1000_fR_100_nbR_1_nbB_0/");
@@ -171,81 +174,7 @@ int main() {
 
 
 
-	for (int i=0; i<NUMACTIONS; i++){
-		gp << "set xrange [-500:10000]\nset yrange [0:0.3]\n";
-		gp << "set title '" << actions[i] << "'\n";
-		gp << "set terminal x11 "<< i <<" \n";
-		gp << "plot";
-		for (auto dirname: dirnames){
-			name = basedir+dirname+"model_acc_";
-			std::vector<float> graph;
-			std::vector<int> x_axis;
 
-			ifs.open(name+actions[i]+".ser");
-			boost::archive::text_iarchive graph_archive(ifs);
-			graph_archive & graph;
-			ifs.close();
-			ifs.clear();
-
-			ifs.open(basedir+dirname+"x_axis.ser");
-			boost::archive::text_iarchive axis_archive(ifs);
-			axis_archive & x_axis;
-			ifs.close();
-			ifs.clear();
-
-			std::vector<float> num_trials;
-			ifs.open(basedir+dirname+"num_trials.ser");
-			boost::archive::text_iarchive num_trials_archive(ifs);
-			num_trials_archive & num_trials;
-			ifs.close();
-			ifs.clear();
-			graph = div(graph,num_trials);
-
-			gp << gp.file1d(boost::make_tuple(x_axis,expo_smooth(graph,alpha))) << "with lines title '"<< dirname <<"',";
-		}
-		gp << std::endl;
-	}
-
-	gp << "set xrange [-500:10000]\nset yrange [0:0.3]\n";
-	gp << "set title 'global model'\n";
-	gp << "set terminal x11 "<< NUMACTIONS+4+dirnames.size() <<" \n";
-	gp << "plot";
-	for (auto dirname: dirnames){
-
-		std::vector<int> x_axis;
-		ifs.open(basedir+dirname+"x_axis.ser");
-		boost::archive::text_iarchive axis_archive(ifs);
-		axis_archive & x_axis;
-		ifs.close();
-		ifs.clear();
-
-		std::vector<float> graph_tot(x_axis.size(),0.);
-
-		name = basedir+dirname+"model_acc_";
-
-		for (int i=0;i<NUMACTIONS;i++){
-			std::vector<float> graph;
-			ifs.open(name+actions[i]+".ser");
-			boost::archive::text_iarchive graph_archive(ifs);
-			graph_archive & graph;
-			ifs.close();
-			ifs.clear();
-			graph_tot = graph_tot+graph;
-		}
-
-		for (int i=0;i<graph_tot.size();i++){
-			graph_tot[i]/=NUMACTIONS;
-		}
-		std::vector<float> num_trials;
-		ifs.open(basedir+dirname+"num_trials.ser");
-		boost::archive::text_iarchive num_trials_archive(ifs);
-		num_trials_archive & num_trials;
-		ifs.close();
-		ifs.clear();
-		graph_tot = div(graph_tot,num_trials);
-		gp << gp.file1d(boost::make_tuple(x_axis,expo_smooth(graph_tot,alpha))) << "with lines title '"<< dirname <<"',";
-	}
-	gp << std::endl;
 
 /*	if (ACT_TRY){
 		std::vector<std::vector<std::pair<float,float>>> act_try(NUMACTIONS);
@@ -260,7 +189,7 @@ int main() {
 			ifs.clear();
 		}
 
-		gp << "set xrange [0:1000]\nset yrange [0:6000]\n";
+		gp << "set xrange [0:4000]\nset yrange [0:6000]\n";
 		// Data will be sent via a temporary file.  These are erased when you call
 		// gp.clearTmpfiles() or when gp goes out of scope.  If you pass a filename
 		// (e.g. "gp.file1d(pts, 'mydata.dat')"), then the named file will be created
@@ -350,42 +279,11 @@ int main() {
 		ifs.clear();
 	}*/
 
-//	gp << "set xrange [-500:10000]\nset yrange [0:0.1]\n";
-//	gp << "set title 'Reward model error'\n";
-//	gp << "set terminal x11 "<< NUMACTIONS+1 <<" \n";
-//	gp << "plot";
-//	for (auto dirname: dirnames){
-//		name = basedir+dirname+"reward_model_acc.ser";
-//		std::vector<float> graph;
-//		std::vector<int> x_axis;
-//
-//		ifs.open(name);
-//		boost::archive::text_iarchive ia(ifs);
-//		ia & graph;
-//		ifs.close();
-//		ifs.clear();
-//
-//		ifs.open(basedir+dirname+"x_axis.ser");
-//		boost::archive::text_iarchive axis_archive(ifs);
-//		axis_archive & x_axis;
-//		ifs.close();
-//		ifs.clear();
-//
-//		std::vector<float> num_trials;
-//		ifs.open(basedir+dirname+"num_trials.ser");
-//		boost::archive::text_iarchive num_trials_archive(ifs);
-//		num_trials_archive & num_trials;
-//		ifs.close();
-//		ifs.clear();
-//		graph = div(graph,num_trials);
-//
-//		gp << gp.file1d(boost::make_tuple(x_axis,expo_smooth(graph,alpha))) << "with lines title '"<< dirname <<"',";
-//	}
-//	gp << std::endl;
 
-	gp << "set xrange [-500:10000]\nset yrange [0:1000]\n";
+
+	gp << "set xrange [0:4000]\nset yrange [0:10000]\n";
 	gp << "set title 'Cumulative reward'\n";
-	gp << "set terminal x11 "<< NUMACTIONS+2 <<" \n";
+	gp << "set terminal x11 "<< 0 <<" \n";
 	gp << "plot";
 	for (auto dirname: dirnames){
 
@@ -411,15 +309,15 @@ int main() {
 		num_trials_archive & num_trials;
 		ifs.close();
 		ifs.clear();
-		graph = div(graph,num_trials);
+		auto res = postproc(graph,x_axis,num_trials,alpha);
 
-		gp << gp.file1d(boost::make_tuple(x_axis,graph)) << "with lines title '"<< dirname <<"',";
+		gp << gp.file1d(res) << "with lines title '"<< dirname <<"',";
 	}
 	gp << std::endl;
 
-	gp << "set xrange [-500:10000]\nset yrange [0:1000]\n";
+	gp << "set xrange [0:4000]\nset yrange [0:10000]\n";
 	gp << "set title 'Cumulative tutor reward'\n";
-	gp << "set terminal x11 "<< NUMACTIONS+3 <<" \n";
+	gp << "set terminal x11 "<< 1 <<" \n";
 
 	gp << "plot";
 	for (auto dirname: dirnames){
@@ -445,16 +343,15 @@ int main() {
 		num_trials_archive & num_trials;
 		ifs.close();
 		ifs.clear();
-		graph = div(graph,num_trials);
+		auto res = postproc(graph,x_axis,num_trials,alpha);
 
-		//gp << gp.file1d(boost::make_tuple(x_axis,avg_smooth(graph,ws))) << "with lines title '"<< dirname <<"',";
-		gp << gp.file1d(boost::make_tuple(x_axis,graph)) << "with lines title '"<< dirname <<"',";
+		gp << gp.file1d(res) << "with lines title '"<< dirname <<"',";
 	}
 	gp << std::endl;
 
-	gp << "set xrange [-500:10000]\nset yrange [0:10000]\n";
+	gp << "set xrange [0:4000]\nset yrange [0:10000]\n";
 	gp << "set title 'Cumulative tutor reward 2'\n";
-	gp << "set terminal x11 "<< NUMACTIONS+4 <<" \n";
+	gp << "set terminal x11 "<< 2 <<" \n";
 	gp << "plot";
 	for (auto dirname: dirnames){
 		name = basedir+dirname+"accu_tutor_rewards_2.ser";
@@ -479,17 +376,16 @@ int main() {
 		num_trials_archive & num_trials;
 		ifs.close();
 		ifs.clear();
-		graph = div(graph,num_trials);
+		auto res = postproc(graph,x_axis,num_trials,alpha);
 
-		//gp << gp.file1d(boost::make_tuple(x_axis,avg_smooth(graph,ws))) << "with lines title '"<< dirname <<"',";
-		gp << gp.file1d(boost::make_tuple(x_axis,graph)) << "with lines title '"<< dirname <<"',";
+		gp << gp.file1d(res) << "with lines title '"<< dirname <<"',";
 	}
 	gp << std::endl;
 
-	gp << "set xrange [-500:10000]\nset yrange [0:1]\n";
+	gp << "set xrange [0:4000]\nset yrange [0:1]\n";
 	for (int i =0;i<dirnames.size();i++){
 		gp << "set title 'Q values content : " << dirnames[i] << "'\n";
-		gp << "set terminal x11 "<< NUMACTIONS+5+i <<" \n";
+		gp << "set terminal x11 "<< 3+i <<" \n";
 		std::vector<float> graph_reward;
 		std::vector<float> graph_sync;
 		std::vector<float> graph_var;
@@ -533,24 +429,23 @@ int main() {
 		ifs.close();
 		ifs.clear();
 
-		graph_reward = div(graph_reward,num_trials);
-		graph_sync = div(graph_sync,num_trials);
-		graph_var = div(graph_var,num_trials);
-		graph_nov = div(graph_nov,num_trials);
+		auto res_reward = postproc(graph_reward,x_axis,num_trials,alpha);
+		auto res_sync = postproc(graph_sync,x_axis,num_trials,alpha);
+		auto res_var = postproc(graph_var,x_axis,num_trials,alpha);
+		auto res_nov = postproc(graph_nov,x_axis,num_trials,alpha);
 
 
 		gp << "plot '-' with lines title 'external reward', '-' with lines title 'sync bonus', "
 				"'-' with lines title 'variance bonus', '-' with lines title 'novelty bonus'\n";
-		gp.send1d(boost::make_tuple(x_axis,expo_smooth(graph_reward, alpha)));
-		gp.send1d(boost::make_tuple(x_axis,expo_smooth(graph_sync, alpha)));
-		gp.send1d(boost::make_tuple(x_axis,expo_smooth(graph_var, alpha)));
-		gp.send1d(boost::make_tuple(x_axis,expo_smooth(graph_nov, alpha)));
+		gp.send1d(res_reward);
+		gp.send1d(res_sync);
+		gp.send1d(res_var);
+		gp.send1d(res_nov);
 
 	}
 	gp << std::endl;
-
-
-
 }
+
+
 
 
